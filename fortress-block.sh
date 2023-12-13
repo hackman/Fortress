@@ -1,6 +1,5 @@
 #!/bin/bash
-#config=/etc/fortress/fortress.conf
-config=fortress.conf
+config=/etc/fortress/fortress.conf
 
 if [[ ! -f $config ]]; then
 	echo "Missing configuration file: $config"
