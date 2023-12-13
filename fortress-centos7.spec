@@ -1,6 +1,6 @@
 Name:		fortress
 Version:	1.0
-Release:	2
+Release:	3
 Summary:	Fortress connection monitoring and protection
 License:	GPLv2
 URL:		https://github.com/hackman/Fortress
@@ -55,14 +55,12 @@ rm -rf %{buildroot}
 %config(noreplace)     /etc/fortress/bingbot.txt
 %config(noreplace)     /etc/fortress/yandex.txt
 %config(noreplace)     /etc/fortress/my.txt
-#%config(noreplace)     /etc/systemd/system/fortress.service
-#%attr(600, root, root) /etc/sudoers.d/fortress
-#%attr(600, root, root) /etc/cron.d/fortress
+%config(noreplace)     /etc/systemd/system/fortress.service
 %attr(750, root, root) /usr/lib/fortress
 %attr(700, root, root) /usr/sbin/fortress
 %attr(700, root, root) /usr/sbin/fortress-block
-#%attr(700, root, root) /usr/sbin/fortress-unblock
-%attr(750, root, root) /usr/share/fortress
+%attr(700, root, root) /usr/sbin/fortress-unblock
+%attr(755, root, root) /usr/share/fortress
 %attr(644, root, root) /usr/share/fortress/LICENSE
 %attr(750, root, root) /var/log/fortress
 %attr(750, root, root) /var/run/fortress
