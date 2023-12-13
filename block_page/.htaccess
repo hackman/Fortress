@@ -1,0 +1,3 @@
+RewriteEngine On
+RewriteCond %{REQUEST_URI} !blocked.png$
+RewriteRule .* /var/www/html/index.html
