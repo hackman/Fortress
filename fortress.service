@@ -1,0 +1,16 @@
+[Unit]
+Description=Fortress connection blocking service
+After=network.target
+
+[Service]
+Type=exec
+
+# Disable OOM kill for this process
+OOMScoreAdjust=-1000
+
+ExecStart=/usr/sbin/fortress
+
+TimeoutSec=15
+
+[Install]
+WantedBy=multi-user.target
