@@ -208,7 +208,7 @@ while (1) {
 			$syn_sent{$ip}++;
 		}
 
-		# Check established conns, ONLY if the load is high and the port is one of the ports configured to be monitored
+		# Check established conns, if the port is one of the ports configured to be monitored
 		if ($state eq '01' and exists $ports{$local_hex_port}) {
 			$established{$ip}++;
 		}
