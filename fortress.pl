@@ -5,7 +5,7 @@ use POSIX qw(strftime setsid);
 use Net::Patricia;
 use Storable;
 
-my $VERSION = '1.0';
+my $VERSION = '2.0';
 my %established = ();
 my %syn_sent = ();
 my %ports = ();
@@ -177,6 +177,7 @@ while (1) {
 	# We do this check here, otherwise we would need to do it in the loop, just before we check the $established count.
 	$conn_count = $config{'high_conns'}	if ($load > $config{'high_load'});
 
+	# Collect the stats
 	open my $tcp, '<', '/proc/net/tcp' or die "Error: Failed to open /proc/net/tcp: $!";
 	while (<$tcp>) {
 		#  sl  local_address rem_address   st tx_queue rx_queue tr tm->when retrnsmt   uid  timeout inode
@@ -205,26 +206,28 @@ while (1) {
 		# This should be checked no matter the load value.
 		if ($state eq '03') {
 			$syn_sent{$ip}++;
-			if ($syn_sent{$ip} > $config{'syn_recv_conns'}) {
-				block_ip(\%config, $blocked_ref, $ip, "Blocking IP $ip for having more then $syn_sent{$ip} SYN_RECV connections");
-				next;
-			}
 		}
 
 		# Check established conns, ONLY if the load is high and the port is one of the ports configured to be monitored
-		if ($load > $config{'high_load'} and
-			$state eq '01' and
-			exists $ports{$local_hex_port}) {
+		if ($state eq '01' and exists $ports{$local_hex_port}) {
 			$established{$ip}++;
-			if ($established{$ip} > $conn_count) {
-				block_ip(\%config, $blocked_ref, $ip, "Blocking IP $ip for having more then $established{$ip} ESTABLISHED connections");
-			}
+		}
+	}	# read /proc/net/tcp
 
+	# Check if we need to block any IP. We do it here and not in the above loop, so we know what was the actual number of conns from the IP.
+	while (my ($ip, $conns) = each(%syn_sent)) {
+		if ($syn_sent{$ip} > $config{'syn_recv_conns'}) {
+			block_ip(\%config, $blocked_ref, $ip, "Blocking IP $ip for having more then $syn_sent{$ip} SYN_RECV connections");
+		}
+	}
+	while (my ($ip, $conns) = each(%established)) {
+		if ($established{$ip} > $conn_count) {
+			block_ip(\%config, $blocked_ref, $ip, "Blocking IP $ip for having more then $established{$ip} ESTABLISHED connections");
 			if ($config{'debug'}) {
 				logger(\%config, sprintf("port: %5d ip: %12s conns: %d", hex($local_hex_port), $ip, $established{$ip}));
 			}
-		}	# connection state ESTABLISHED
-	}	# read /proc/net/tcp
+		}
+	}
 	close $tcp;
 	select(undef, undef, undef, 1);
 }
