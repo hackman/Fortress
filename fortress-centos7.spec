@@ -1,6 +1,6 @@
 Name:		fortress
 Version:	1.0
-Release:	1
+Release:	2
 Summary:	Fortress connection monitoring and protection
 License:	GPLv2
 URL:		https://github.com/hackman/Fortress
@@ -25,7 +25,6 @@ and unblocks IPs that may put the machine at risk.
 %install
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/etc/fortress
-mkdir -p %{buildroot}/etc/cron.d
 mkdir -p %{buildroot}/etc/systemd/system
 mkdir -p %{buildroot}/etc/sudoers.d
 mkdir -p %{buildroot}/usr/sbin
@@ -35,14 +34,12 @@ mkdir -p %{buildroot}/var/log/fortress
 mkdir -p %{buildroot}/var/run/fortress
 mkdir -p %{buildroot}/var/cache/fortress
 cp fortress.conf %{buildroot}/etc/fortress/
-cp etc/sudoers.d/fortress %{buildroot}/etc/sudoers.d/
+cp excludes/* %{buildroot}/etc/fortress/
 cp fortress.service %{buildroot}/etc/systemd/system
-cp fortress.cron %{buildroot}/etc/cron.d/fortress
 cp fortress.pl %{buildroot}/usr/sbin/fortress
 cp fortress-block.sh %{buildroot}/usr/sbin/fortress-block
 cp fortress-unblock.sh %{buildroot}/usr/sbin/fortress-unblock
 cp LICENSE %{buildroot}/usr/share/fortress
-cp -a excludes %{buildroot}/etc/fortress/
 
 %clean
 rm -rf %{buildroot}
@@ -58,13 +55,13 @@ rm -rf %{buildroot}
 %config(noreplace)     /etc/fortress/bingbot.txt
 %config(noreplace)     /etc/fortress/yandex.txt
 %config(noreplace)     /etc/fortress/my.txt
-%config(noreplace)     /etc/systemd/system/fortress.service
-%attr(600, root, root) /etc/sudoers.d/fortress
-%attr(600, root, root) /etc/cron.d/fortress
+#%config(noreplace)     /etc/systemd/system/fortress.service
+#%attr(600, root, root) /etc/sudoers.d/fortress
+#%attr(600, root, root) /etc/cron.d/fortress
 %attr(750, root, root) /usr/lib/fortress
 %attr(700, root, root) /usr/sbin/fortress
 %attr(700, root, root) /usr/sbin/fortress-block
-%attr(700, root, root) /usr/sbin/fortress-unblock
+#%attr(700, root, root) /usr/sbin/fortress-unblock
 %attr(750, root, root) /usr/share/fortress
 %attr(644, root, root) /usr/share/fortress/LICENSE
 %attr(750, root, root) /var/log/fortress
@@ -75,8 +72,8 @@ rm -rf %{buildroot}
 %systemd_post fortress.service
 
 %preun
-if [ -f /var/run/fortress/fortress.pid ]; then
-	kill $(cat /var/run/fortress/fortress.pid)
+if [ -f /var/run/fortress.pid ]; then
+	kill $(cat /var/run/fortress.pid)
 fi
 
 %postun
