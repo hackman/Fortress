@@ -31,7 +31,7 @@ When the load is below the high limit(high_load), the number of simultaneous con
 When the load is above the high limit(high_load), the number of simultaneous connections from a single IP has to be above 30(high_conns) in order to get blocked.
 
 # Configuration
-Configuration, by default is expected to be in `/etc/fortress/fortress.conf`. We have tried to provide enough comments in there to reduce the need for separate documentation.
+Configuration, by default is expected to be in [`/etc/fortress/fortress.conf`](fortress.conf). We have tried to provide enough comments in there to reduce the need for separate documentation.
 
 # Blocking
 Fortress supports 3 different types of blocking the offending IPs. And all 3 are defined in the `fortress-block.sh`.
