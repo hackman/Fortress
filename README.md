@@ -15,6 +15,21 @@ To that end, we have provided a compiled list of IP ranges from the biggest prov
 
 Right now, the tool supports only TCP with UDP to be added soon. It checks conns only in either SYN_RECV or ESTABLISHED states to prevent either resource exhaustion or service interruption(flood).
 
+# How does it work?
+
+Fortress parses `/proc/net/tcp`(the tcp states provided by the Linux kernel) every second and also checks the load of the machine from `/proc/loadavg`. 
+
+It first creates a list of connections for the monitored ports. Then based on the configuration(high_load, low_conns, high_cons, syn_recv_conns) it decides if an IP has to be blocked. 
+
+It uses an external [shell script](fortress-block.sh), that can be modified by the administrator, to block IPs.
+
+
+With the default configuration, Fortress will look for syn flood conns all the time. These are IPs sending more then 20 TCP packets with SYN flag set. This means that at a single moment, this IP has tried to open more then 20(syn_recv_conns) simultaneous connections to the server. 
+ 
+It will also check established connections. These are connections that already have the TCP 3-way handshake finished and application is expected to handle them. 
+When the load is below the high limit(high_load), the number of simultaneous connections from a single IP has to be above 50(low_conns) in order to get blocked.
+When the load is above the high limit(high_load), the number of simultaneous connections from a single IP has to be above 30(high_conns) in order to get blocked.
+
 # Configuration
 Configuration, by default is expected to be in `/etc/fortress/fortress.conf`. We have tried to provide enough comments in there to reduce the need for separate documentation.
 
