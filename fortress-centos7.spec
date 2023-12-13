@@ -56,6 +56,8 @@ rm -rf %{buildroot}
 %config(noreplace)     /etc/fortress/yandex.txt
 %config(noreplace)     /etc/fortress/my.txt
 %config(noreplace)     /etc/systemd/system/fortress.service
+%config(noreplace)     /usr/sbin/fortress-block
+%config(noreplace)     /usr/sbin/fortress-unblock
 %attr(750, root, root) /usr/lib/fortress
 %attr(700, root, root) /usr/sbin/fortress
 %attr(700, root, root) /usr/sbin/fortress-block
