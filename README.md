@@ -34,7 +34,7 @@ When the load is above the high limit(high_load), the number of simultaneous con
 Configuration, by default is expected to be in [`/etc/fortress/fortress.conf`](fortress.conf). We have tried to provide enough comments in there to reduce the need for separate documentation.
 
 # Blocking
-Fortress supports 3 different types of blocking the offending IPs. And all 3 are defined in the `fortress-block.sh`.
+Fortress supports 3 different types of blocking the offending IPs. And all 3 are defined in the [`fortress-block.sh`](fortress-block.sh).
 1. `iptables` - blocking the IPs directly in your firewall with iptables. You can also create a dedicated chain for that and set its name in fortres.conf
 2. `ipset` - a more efficient blocking mechanism would be to levarage IPsets. This allows you to block large number of IPs without overwhelming iptables and slowing down the packet processing.
 3. redirection - in this mechanism, we forward the TCP connection to a separate server, on which we expect to have a block page explaining, why the client is not seeing the expected web page. This mechanims uses DNAT and SNAT to achieve this and is the most resource inefficient way. However, it does give proper information to the end user. An example blocked page can be seen in the [block_page](block_page) folder.
