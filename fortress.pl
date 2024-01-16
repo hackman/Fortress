@@ -191,7 +191,7 @@ while (1) {
 
 		# Do not check states other then ESTABLISHED and SYN_RECV
 		next if (!exists $monitored_states{$state});
-		# The IP is written in reverse byte order, in hex. This convers each two hex chars into a number and at the end returns the dotted IPv4 format, that is expected.
+		# The IP is written in reverse byte order, in hex. This converts each two hex chars into a number and at the end returns the dotted IPv4 format, that is expected.
 		my $ip = hex(substr($remote_hex_ip,6,2)) . '.' . hex(substr($remote_hex_ip,4,2)) . '.' . hex(substr($remote_hex_ip,2,2)) . '.' . hex(substr($remote_hex_ip,0,2));
 		# Do not continue if the IP is in the excluded list
 		next if ($excludes->match_string($ip));
