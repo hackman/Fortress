@@ -5,7 +5,7 @@ use POSIX qw(strftime setsid);
 use Net::Patricia;
 use Storable;
 
-my $VERSION = '2.0';
+my $VERSION = '2.1';
 my %established = ();
 my %syn_sent = ();
 my %ports = ();
@@ -70,7 +70,6 @@ sub block_ip {
 	my $blocked_ref = shift;
 	my $ip = shift;
 	my $msg = shift;
-	return;
 	return if (exists $blocked_ref->{$ip});	   # already blocked
 
 	logger($conf_ref, $msg);
@@ -161,6 +160,7 @@ my %monitored_states = (
 );
 
 $0 = 'Fortress';
+logger("$0 version $VERSION started");
 while (1) {
 	# Make sure we start the loop with empty values
 	%established= ();
@@ -223,9 +223,6 @@ while (1) {
 	while (my ($ip, $conns) = each(%established)) {
 		if ($established{$ip} > $conn_count) {
 			block_ip(\%config, $blocked_ref, $ip, "Blocking IP $ip for having more then $established{$ip} ESTABLISHED connections");
-			if ($config{'debug'}) {
-				logger(\%config, sprintf("port: %5d ip: %12s conns: %d", hex($local_hex_port), $ip, $established{$ip}));
-			}
 		}
 	}
 	close $tcp;
