@@ -24,7 +24,7 @@ fi
 # Parameters:
 # 1 - IP
 # 2 - Comment
-ipset_block() {
+ipset_unblock() {
 	ip=$1
 	shift
 	ipset_name=$( awk -F= '/ipset_name/  && $1 !~ /^\s*#/ {print $2}' $config)
@@ -32,13 +32,13 @@ ipset_block() {
 		echo -e "Error: unable to find ipset_name in $config.\nPlease check the configuration and try again.\n"
 		exit
 	fi
-	ipset del $ipset_name $ip
+	ipset del $ipset_name $ip 2>/dev/null
 }
 
 # Parameters:
 # 1 - IP
 # 2 - Comment
-iptables_block() {
+iptables_unblock() {
 	ip=$1
 	shift
 	chain=INPUT
@@ -67,10 +67,10 @@ redirection() {
 
 case "$block_type" in
 	ipset)
-		ipset_block $*
+		ipset_unblock $*
 	;;
 	iptables)
-		iptables_block $*
+		iptables_unblock $*
 	;;
 	redirect)
 		redirection $*
