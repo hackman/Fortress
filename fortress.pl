@@ -163,6 +163,8 @@ my %monitored_states = (
 
 $0 = 'Fortress';
 logger("$0 version $VERSION started");
+logger("Ports monitored: $config{'ports'}");
+logger("High load set to: $config{'high_load'}");
 while (1) {
 	# Make sure we start the loop with empty values
 	%established= ();
@@ -222,7 +224,7 @@ while (1) {
 
 	# Check if we need to block any IP. We do it here and not in the above loop, so we know what was the actual number of conns from the IP.
 	while (my ($ip, $conns) = each(%syn_sent)) {
-		if ($syn_sent{$ip} > $config{'syn_recv_conns'}) {
+		if ($syn_sent{$ip} > $syn_count) {
 			block_ip(\%config, $blocked_ref, $ip, "Blocking IP $ip for having more then $config{'syn_recv_conns'}($syn_sent{$ip}) SYN_RECV connections");
 		}
 	}
