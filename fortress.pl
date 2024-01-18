@@ -5,7 +5,7 @@ use POSIX qw(strftime setsid);
 use Net::Patricia;
 use Storable;
 
-my $VERSION = '3.0';
+my $VERSION = '3.1';
 my %established = ();
 my %syn_sent = ();
 my %ports = ();
