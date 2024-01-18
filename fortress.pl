@@ -5,7 +5,7 @@ use POSIX qw(strftime setsid);
 use Net::Patricia;
 use Storable;
 
-my $VERSION = '3.1';
+my $VERSION = '4.0';
 my %established = ();
 my %syn_sent = ();
 my %ports = ();
@@ -78,8 +78,21 @@ sub block_ip {
 	system($conf_ref->{'block_script'}, $ip, $msg);
 }
 
-# Make sure localhost is not blocked
-$excludes->add_string('127.0.0.1', 'local');
+sub get_local_ips {
+	my $excluded_ref = shift;
+	open my $ips, '-|', '/usr/sbin/ip -4 a l';
+	while(my $line = <$ips>) {
+		if ($line =~ /inet ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\/[0-9]+/) {
+			$excluded_ref->add_string($1, 'local');
+		}
+	}
+	close $ips;
+	return;
+}
+
+# Make sure none of the local IPs on the machine gets accidentally blocked
+get_local_ips($excludes);
+
 if (exists $config{'exclude_files'} and $config{'exclude_files'} ne '') {
 	foreach my $file(split /\s+/, $config{'exclude_files'}) {
 		open my $fh, '<', $file;
