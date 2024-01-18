@@ -7,6 +7,7 @@ if [[ ! -f $config ]]; then
 fi
 redirect_ip=$(awk -F= '/redirect_ip/ && $1 !~ /^\s*#/ {print $2}' $config)
 block_type=$( awk -F= '/block_type/  && $1 !~ /^\s*#/ {print $2}' $config)
+block_time=$( awk -F= '/block_time/  && $1 !~ /^\s*#/ {print $2}' $config)
 
 ip=''
 comment=''
@@ -33,7 +34,7 @@ ipset_block() {
 		exit
 	fi
 	if [[ -n $1 ]]; then
-		ipset add $ipset_name $ip comment "$*"
+		ipset add $ipset_name $ip comment "$*" timeout $block_time
 	else
 		ipset add $ipset_name $ip
 	fi
