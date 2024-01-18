@@ -5,7 +5,7 @@ use POSIX qw(strftime setsid);
 use Net::Patricia;
 use Storable;
 
-my $VERSION = '4.2';
+my $VERSION = '4.3';
 my %established = ();
 my %syn_sent = ();
 my %ports = ();
@@ -238,7 +238,7 @@ while (1) {
 	# Check if we need to block any IP. We do it here and not in the above loop, so we know what was the actual number of conns from the IP.
 	while (my ($ip, $conns) = each(%syn_sent)) {
 		if ($syn_sent{$ip} > $syn_count) {
-			block_ip(\%config, $blocked_ips, $ip, "Blocking IP $ip for having more then $config{'syn_recv_conns'}($syn_sent{$ip}) SYN_RECV connections");
+			block_ip(\%config, $blocked_ips, $ip, "Blocking IP $ip for having more then $syn_count($syn_sent{$ip}) SYN_RECV connections");
 		}
 	}
 	while (my ($ip, $conns) = each(%established)) {
