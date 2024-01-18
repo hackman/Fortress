@@ -5,12 +5,12 @@ use POSIX qw(strftime setsid);
 use Net::Patricia;
 use Storable;
 
-my $VERSION = '4.0';
+my $VERSION = '4.1';
 my %established = ();
 my %syn_sent = ();
 my %ports = ();
 my %blocked = ();
-my $blocked_ref = \%blocked;
+my $blocked_ips = \%blocked;
 my $counter = 0;
 my $old_pid = '';
 my $umask = umask;
@@ -137,7 +137,7 @@ if ( -e $config{'pid_file'} ) {
 }
 
 if ( -f $config{'store_db'}) {
-	$blocked_ref = retrieve($config{'store_db'});
+	$blocked_ips = retrieve($config{'store_db'});
 	logger(\%config, "Loaded blocked IPs from the store_db file.");
 	unlink($config{'store_db'});
 	logger(\%config, "Removed old store_db file.");
@@ -185,7 +185,7 @@ while (1) {
 	$counter++;
 	# We use a counter here, instead of actual times as it is more efficient. The counter is not so suffisticated, as
 	# the code, some times may not execute in less then 1sec. But we don't need high accuracy here.
-	clean_ips(\%config, $blocked_ref)	if ($counter%10 == 0);	# execute every 10th time (10sec)
+	clean_ips(\%config, $blocked_ips)	if ($counter%10 == 0);	# execute every 10th time (10sec)
 	$load = get_load(\%config)			if ($counter%5  == 0);	# get the current load every 5 seconds
 	$counter=0  						if ($counter > 10000);	# reset the counter to prevent comparison of very high numbers
 	store \%blocked, $config{'store_db'} if ($counter%120 == 0);# execute every 120th time (rufly every 120sec)
@@ -238,12 +238,12 @@ while (1) {
 	# Check if we need to block any IP. We do it here and not in the above loop, so we know what was the actual number of conns from the IP.
 	while (my ($ip, $conns) = each(%syn_sent)) {
 		if ($syn_sent{$ip} > $syn_count) {
-			block_ip(\%config, $blocked_ref, $ip, "Blocking IP $ip for having more then $config{'syn_recv_conns'}($syn_sent{$ip}) SYN_RECV connections");
+			block_ip(\%config, $blocked_ips, $ip, "Blocking IP $ip for having more then $config{'syn_recv_conns'}($syn_sent{$ip}) SYN_RECV connections");
 		}
 	}
 	while (my ($ip, $conns) = each(%established)) {
 		if ($established{$ip} > $conn_count) {
-			block_ip(\%config, $blocked_ref, $ip, "Blocking IP $ip for having more then $conn_count($established{$ip}) ESTABLISHED connections");
+			block_ip(\%config, $blocked_ips, $ip, "Blocking IP $ip for having more then $conn_count($established{$ip}) ESTABLISHED connections");
 		}
 	}
 	close $tcp;
