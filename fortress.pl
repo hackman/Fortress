@@ -5,7 +5,7 @@ use POSIX qw(strftime setsid);
 use Net::Patricia;
 use Storable;
 
-my $VERSION = '4.1';
+my $VERSION = '4.2';
 my %established = ();
 my %syn_sent = ();
 my %ports = ();
@@ -175,9 +175,9 @@ my %monitored_states = (
 );
 
 $0 = 'Fortress';
-logger("$0 version $VERSION started");
-logger("Ports monitored: $config{'ports'}");
-logger("High load set to: $config{'high_load'}");
+logger(\%config, "$0 version $VERSION started");
+logger(\%config, "Ports monitored: $config{'ports'}");
+logger(\%config, "High load set to: $config{'high_load'}");
 while (1) {
 	# Make sure we start the loop with empty values
 	%established= ();
